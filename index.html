@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Clock</title>
+
+    <style>
+
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            margin:0;
+            text-align:center;
+            background: linear-gradient(135deg,#6a7bd8,#7c4bb6);
+            color:white;
+        }
+
+        h1{
+            margin-top:20px;
+        }
+
+        .container{
+            width:1100px;
+            margin:auto;
+            margin-top:30px;
+            display:grid;
+            grid-template-columns: repeat(3,1fr);
+            gap:30px;
+        }
+
+        .card{
+            background:#f1f1f1;
+            border-radius:15px;
+            padding:20px;
+            color:black;
+        }
+
+        .city{
+            color:#5b78ff;
+            font-weight:bold;
+        }
+
+        .time{
+            font-size:26px;
+            margin:10px 0;
+        }
+
+        .date{
+            font-size:12px;
+            color:#555;
+        }
+
+        canvas{
+            margin-top:10px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<h1>🌍 World Clock</h1>
+
+<div class="container">
+
+    <div class="card">
+        <div class="city">VN Hanoi, Vietnam</div>
+        <div class="time" id="hanoi-time"></div>
+        <div class="date" id="hanoi-date"></div>
+        <canvas id="hanoi-clock" width="150" height="150"></canvas>
+    </div>
+
+    <div class="card">
+        <div class="city">MM Yangon, Myanmar</div>
+        <div class="time" id="yangon-time"></div>
+        <div class="date" id="yangon-date"></div>
+        <canvas id="yangon-clock" width="150" height="150"></canvas>
+    </div>
+
+    <div class="card">
+        <div class="city">KR Seoul, Korea</div>
+        <div class="time" id="seoul-time"></div>
+        <div class="date" id="seoul-date"></div>
+        <canvas id="seoul-clock" width="150" height="150"></canvas>
+    </div>
+
+    <div class="card">
+        <div class="city">JP Tokyo, Japan</div>
+        <div class="time" id="tokyo-time"></div>
+        <div class="date" id="tokyo-date"></div>
+        <canvas id="tokyo-clock" width="150" height="150"></canvas>
+    </div>
+
+    <div class="card">
+        <div class="city">SG Singapore</div>
+        <div class="time" id="singapore-time"></div>
+        <div class="date" id="singapore-date"></div>
+        <canvas id="singapore-clock" width="150" height="150"></canvas>
+    </div>
+
+    <div class="card">
+        <div class="city">MY Kuala Lumpur</div>
+        <div class="time" id="kl-time"></div>
+        <div class="date" id="kl-date"></div>
+        <canvas id="kl-clock" width="150" height="150"></canvas>
+    </div>
+
+</div>
+
+
+<script>
+
+    function getTime(zone){
+
+        const now = new Date();
+
+        const time = new Intl.DateTimeFormat('en-US',{
+            timeZone:zone,
+            hour:'2-digit',
+            minute:'2-digit',
+            second:'2-digit',
+            hour12:false
+        }).format(now);
+
+        const date = new Intl.DateTimeFormat('en-US',{
+            timeZone:zone,
+            weekday:'long',
+            year:'numeric',
+            month:'long',
+            day:'numeric'
+        }).format(now);
+
+        const parts = new Intl.DateTimeFormat('en-US',{
+            timeZone:zone,
+            hour:'numeric',
+            minute:'numeric',
+            second:'numeric',
+            hour12:false
+        }).formatToParts(now);
+
+        let h,m,s;
+
+        parts.forEach(p=>{
+            if(p.type==='hour') h=parseInt(p.value);
+            if(p.type==='minute') m=parseInt(p.value);
+            if(p.type==='second') s=parseInt(p.value);
+        });
+
+        return {time,date,h,m,s};
+    }
+
+
+
+    function drawClock(canvasId,h,m,s){
+
+        const canvas=document.getElementById(canvasId);
+        const ctx=canvas.getContext("2d");
+
+        const radius=70;
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        ctx.beginPath();
+        ctx.arc(75,75,radius,0,Math.PI*2);
+        ctx.strokeStyle="#4b6cff";
+        ctx.lineWidth=2;
+        ctx.stroke();
+
+        for(let i=0;i<12;i++){
+            let angle=i*Math.PI/6;
+            let x=75+Math.sin(angle)*55;
+            let y=75-Math.cos(angle)*55;
+
+            ctx.fillStyle="#4b6cff";
+            ctx.font="14px Arial";
+            ctx.textAlign="center";
+            ctx.textBaseline="middle";
+            ctx.fillText(i===0?12:i,x,y);
+        }
+
+        let hourAngle=((h%12)+m/60)*Math.PI/6;
+        let minuteAngle=(m+s/60)*Math.PI/30;
+        let secondAngle=s*Math.PI/30;
+
+        drawHand(ctx,75,75,hourAngle,35,3,"black");
+        drawHand(ctx,75,75,minuteAngle,43,2,"black");
+        drawHand(ctx,75,75,secondAngle,48,2,"red");
+
+        // center dot
+        ctx.beginPath();
+        ctx.arc(75, 75, 4, 0, Math.PI * 2);
+        ctx.fillStyle = "#00bcd4";
+        ctx.fill();
+
+    }
+
+    function drawHand(ctx,x,y,angle,length,width,color){
+
+        ctx.beginPath();
+        ctx.lineWidth=width;
+        ctx.strokeStyle=color;
+
+        ctx.moveTo(x,y);
+        ctx.lineTo(
+            x+Math.sin(angle)*length,
+            y-Math.cos(angle)*length
+        );
+
+        ctx.stroke();
+    }
+
+
+
+    function updateClock(){
+
+        const zones={
+            hanoi:"Asia/Bangkok",
+            yangon:"Asia/Yangon",
+            seoul:"Asia/Seoul",
+            tokyo:"Asia/Tokyo",
+            singapore:"Asia/Singapore",
+            kl:"Asia/Kuala_Lumpur"
+        };
+
+        for(let key in zones){
+
+            let t=getTime(zones[key]);
+
+            document.getElementById(key+"-time").innerText=t.time;
+            document.getElementById(key+"-date").innerText=t.date;
+
+            drawClock(key+"-clock",t.h,t.m,t.s);
+        }
+
+    }
+
+    setInterval(updateClock,1000);
+    updateClock();
+
+</script>
+
+</body>
+</html>
