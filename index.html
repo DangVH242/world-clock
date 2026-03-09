@@ -33,6 +33,10 @@
             border-radius:15px;
             padding:20px;
             color:black;
+
+            display:flex;
+            flex-direction:column;
+            align-items:center;
         }
 
         .city{
@@ -52,57 +56,97 @@
 
         canvas{
             margin-top:10px;
+            display:block;
+            margin-left:auto;
+            margin-right:auto;
         }
 
+        .display-container{
+
+            display:inline-flex;
+            align-items:center;
+            gap:10px;
+
+            padding:6px 12px;
+            border:0px solid white;
+            border-radius:30px;
+
+            background:rgba(255,255,255,0.15);
+            font-family: Arial;
+            font-size:12px;
+        }
+
+        #displayMode{
+            padding:4px 10px;
+
+            border:2px solid #4b6cff;
+            border-radius:20px;
+
+            background:white;
+            cursor:pointer;
+            outline:none;
+        }
+        .country-code {
+            font-size:12px;
+        }
     </style>
 </head>
 
 <body>
 
 <h1>🌍 World Clock</h1>
+<div class="display-container" style="margin-bottom:20px;">
+    <label><b>Display Mode:</b></label>
+    <label>
+        <select id="displayMode" >
+            <option value="both">Both</option>
+            <option value="digital">Digital</option>
+            <option value="analog">Analog</option>
+        </select>
+    </label>
 
+</div>
 <div class="container">
-
     <div class="card">
-        <div class="city">VN Hanoi, Vietnam</div>
-        <div class="time" id="hanoi-time"></div>
-        <div class="date" id="hanoi-date"></div>
-        <canvas id="hanoi-clock" width="150" height="150"></canvas>
+        <div class="city"><span class="country-code">VN</span> Hanoi, Vietnam</div>
+        <div class="time digital" id="hanoi-time"></div>
+        <div class="date digital" id="hanoi-date"></div>
+        <canvas class="analog" id="hanoi-clock" width="150" height="150"></canvas>
     </div>
 
     <div class="card">
-        <div class="city">MM Yangon, Myanmar</div>
-        <div class="time" id="yangon-time"></div>
-        <div class="date" id="yangon-date"></div>
-        <canvas id="yangon-clock" width="150" height="150"></canvas>
+        <div class="city"><span class="country-code">MM</span> Yangon, Myanmar</div>
+        <div class="time digital" id="yangon-time"></div>
+        <div class="date digital" id="yangon-date"></div>
+        <canvas class="analog" id="yangon-clock" width="150" height="150"></canvas>
     </div>
 
     <div class="card">
-        <div class="city">KR Seoul, Korea</div>
-        <div class="time" id="seoul-time"></div>
-        <div class="date" id="seoul-date"></div>
-        <canvas id="seoul-clock" width="150" height="150"></canvas>
+        <div class="city"><span class="country-code">KR</span> Seoul, Korea</div>
+        <div class="time digital" id="seoul-time"></div>
+        <div class="date digital" id="seoul-date"></div>
+        <canvas class="analog" id="seoul-clock" width="150" height="150"></canvas>
     </div>
 
     <div class="card">
-        <div class="city">JP Tokyo, Japan</div>
-        <div class="time" id="tokyo-time"></div>
-        <div class="date" id="tokyo-date"></div>
-        <canvas id="tokyo-clock" width="150" height="150"></canvas>
+        <div class="city"><span class="country-code">JP</span> Tokyo, Japan</div>
+        <div class="time digital" id="tokyo-time"></div>
+        <div class="date digital" id="tokyo-date"></div>
+        <canvas class="analog" id="tokyo-clock" width="150" height="150"></canvas>
     </div>
 
     <div class="card">
-        <div class="city">SG Singapore</div>
-        <div class="time" id="singapore-time"></div>
-        <div class="date" id="singapore-date"></div>
-        <canvas id="singapore-clock" width="150" height="150"></canvas>
+        <div class="city"><span class="country-code">SG</span> Singapore</div>
+        <div class="time digital" id="singapore-time"></div>
+        <div class="date digital" id="singapore-date"></div>
+        <canvas class="analog" id="singapore-clock" width="150" height="150"></canvas>
     </div>
 
     <div class="card">
-        <div class="city">MY Kuala Lumpur</div>
-        <div class="time" id="kl-time"></div>
-        <div class="date" id="kl-date"></div>
-        <canvas id="kl-clock" width="150" height="150"></canvas>
+        <div class="city"><span class="country-code">MY</span> Kuala Lumpur</div>
+        <div class="time digital" id="kl-time"></div>
+        <div class="date digital" id="kl-date"></div>
+        <canvas class="analog" id="kl-clock" width="150" height="150"></canvas>
     </div>
 
 </div>
@@ -233,6 +277,40 @@
         }
 
     }
+
+    const modeSelect = document.getElementById("displayMode");
+
+    modeSelect.addEventListener("change", function () {
+
+        const mode = this.value;
+
+        const digital = document.querySelectorAll(".digital");
+        const analog = document.querySelectorAll(".analog");
+
+        if (mode === "both") {
+
+            digital.forEach(el => el.style.display = "block");
+            analog.forEach(el => el.style.display = "block");
+
+        }
+
+        if (mode === "digital") {
+
+            digital.forEach(el => el.style.display = "block");
+            analog.forEach(el => el.style.display = "none");
+
+        }
+
+        if (mode === "analog") {
+
+            digital.forEach(el => el.style.display = "none");
+            analog.forEach(el => el.style.display = "block");
+
+        }
+
+        updateClock();
+
+        });
 
     setInterval(updateClock,1000);
     updateClock();
